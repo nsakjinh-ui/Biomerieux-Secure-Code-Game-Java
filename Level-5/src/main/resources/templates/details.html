@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Planet Details</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Planet Details</h2>
+    <!-- VULNERABLE: th:utext renders the value UNESCAPED, just like Jinja2's |safe filter -->
+    <p>Planet name: <span id="name" th:utext="${planet}"></span></p>
+    <p>Planet info: <span th:utext="${info}"></span></p>
+    <br/>
+    <p>Search in Google for more information about the planet: <span id="planet"></span></p>
+    <script>
+        // VULNERABLE: reuses the already-unescaped planet name and injects it as HTML again
+        document.getElementById("planet").innerHTML = document.getElementById("name").textContent;
+    </script>
+</body>
+
+</html>

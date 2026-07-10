@@ -1,0 +1,4 @@
+How does the site handle user input before AND after displaying it?
+
+Look closely at what characters the sanitization regex actually strips — is it the
+only way to write a "<" or a ">" in HTML?
