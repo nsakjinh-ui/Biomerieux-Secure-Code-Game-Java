@@ -22,7 +22,6 @@ public class TaxPayer {
         this.baseDir = resolveAssetsBaseDir();
     }
 
-    // resolves to the "assets" folder shipped alongside this class (classpath resource dir)
     private static Path resolveAssetsBaseDir() {
         try {
             URL url = TaxPayer.class.getClassLoader().getResource("assets");
@@ -34,22 +33,17 @@ public class TaxPayer {
 
     // returns the path of an optional profile picture that users can set
     public String getProfPicture(String path) throws IOException {
-        // setting a profile picture is optional
         if (path == null) {
             return null;
         }
 
-        // defends against path traversal attacks
-        if (path.startsWith("/") || path.startsWith("..")) {
+        // FIXED: resolve + verify the result stays inside baseDir (allow-list, not blocklist)
+        Path profPicturePath = baseDir.resolve(path).normalize();
+        if (!profPicturePath.startsWith(baseDir)) {
             return null;
         }
 
-        // builds path
-        Path profPicturePath = Paths.get(baseDir.toString(), path).normalize();
-
         byte[] picture = Files.readAllBytes(profPicturePath);
-
-        // assume that image is returned on screen after this
         return profPicturePath.toString();
     }
 
@@ -59,10 +53,14 @@ public class TaxPayer {
             throw new IllegalStateException("Error: Tax form is required for all users");
         }
 
-        byte[] taxData = Files.readAllBytes(Paths.get(path));
+        // FIXED: same allow-list check as above (this method previously had none at all)
+        Path taxFormPath = baseDir.resolve(path).normalize();
+        if (!taxFormPath.startsWith(baseDir)) {
+            return null;
+        }
 
-        // assume that tax data is returned on screen after this
-        return path;
+        byte[] taxData = Files.readAllBytes(taxFormPath);
+        return taxFormPath.toString();
     }
 
     public Path getBaseDir() {
@@ -79,4 +77,3 @@ public class TaxPayer {
         }
     }
 }
-
