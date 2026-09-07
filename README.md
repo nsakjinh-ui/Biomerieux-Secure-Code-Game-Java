@@ -2,10 +2,7 @@
 
 _Welcome to the mission : Code Secure!_ :wave:
 
-This is the **Java / Maven / Spring Boot port** of Biomerieux's "Mission: Code Secure"
-(itself based on GitHub's open source [secure-code-game](https://github.com/skills/secure-code-game)).
-Same 5 storylines, same vulnerability classes — rewritten so Java developers can play
-in their own language.
+This is the **Java / Maven / Spring Boot port** of Biomerieux's "Mission: Code Secure".
 
 To get started, please follow the 🛠️ set up guide.
 
