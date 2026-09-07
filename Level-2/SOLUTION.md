@@ -6,7 +6,6 @@ package com.biomerieux.level2;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class TaxPayer {
 
@@ -25,10 +24,9 @@ public class TaxPayer {
             return null;
         }
 
-        Path profPicturePath = Paths.get(baseDir.toString(), path).normalize();
-
-        // Instead of trying to block "dangerous-looking" input (a blocklist),
-        // verify that the resolved, normalized path is still inside baseDir.
+        // Resolve the user-supplied path against baseDir, then verify the
+        // normalized result is still contained inside baseDir.
+        Path profPicturePath = baseDir.resolve(path).normalize();
         if (!profPicturePath.startsWith(baseDir)) {
             return null;
         }
@@ -42,7 +40,7 @@ public class TaxPayer {
             throw new IllegalStateException("Error: Tax form is required for all users");
         }
 
-        Path taxFormPath = Paths.get(baseDir.toString(), path).normalize();
+        Path taxFormPath = baseDir.resolve(path).normalize();
         if (!taxFormPath.startsWith(baseDir)) {
             return null;
         }
@@ -72,6 +70,12 @@ to compute the final, canonical location, then verify with `Path.startsWith(base
 that the result is still contained inside the intended directory. This is an
 **allow-list** approach: only paths that resolve inside the sandboxed directory are
 accepted, regardless of how they're spelled.
+
+Implementation note: use `baseDir.resolve(path)` rather than manually concatenating
+strings (e.g. `Paths.get(baseDir.toString(), path)`). `Path.resolve()` correctly
+handles both relative inputs (appended to `baseDir`) and already-absolute inputs
+(returned as-is, to then be validated against `baseDir`) — a plain string join does
+not.
 
 We covered this flaw in a blog post about OWASP's Top 10 proactive controls:
 https://github.blog/2021-12-06-write-more-secure-code-owasp-top-10-proactive-controls/
