@@ -37,12 +37,12 @@ public class TaxPayer {
             return null;
         }
 
-        // FIXED: resolve + verify the result stays inside baseDir (allow-list, not blocklist)
-        Path profPicturePath = baseDir.resolve(path).normalize();
-        if (!profPicturePath.startsWith(baseDir)) {
+        // defends against path traversal attacks
+        if (path.startsWith("/") || path.startsWith("..")) {
             return null;
         }
 
+        Path profPicturePath = Paths.get(baseDir.toString(), path).normalize();
         byte[] picture = Files.readAllBytes(profPicturePath);
         return profPicturePath.toString();
     }
@@ -53,14 +53,8 @@ public class TaxPayer {
             throw new IllegalStateException("Error: Tax form is required for all users");
         }
 
-        // FIXED: same allow-list check as above (this method previously had none at all)
-        Path taxFormPath = baseDir.resolve(path).normalize();
-        if (!taxFormPath.startsWith(baseDir)) {
-            return null;
-        }
-
-        byte[] taxData = Files.readAllBytes(taxFormPath);
-        return taxFormPath.toString();
+        byte[] taxData = Files.readAllBytes(Paths.get(path));
+        return path;
     }
 
     public Path getBaseDir() {
